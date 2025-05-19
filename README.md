@@ -18,4 +18,4 @@ A simple Python-based terminal game where players chase a target position on a g
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/terminal-chase-game.git
+   git clone https://github.com/urosobucina996/python_games.git
