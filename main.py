@@ -2,18 +2,30 @@ import curses
 import random
 
 WIDTH, HEIGHT = 10, 15
-rand_possition_goal = (random.randint(1, HEIGHT), random.randint(1, WIDTH))
+## Running script state
+running_state = True
+## Define goal possitions
+rand_possition_goal = (
+    random.randint(0, HEIGHT -1),
+    random.randint(0, WIDTH -1)
+)
+## Deffine possition obsticle
+obsticle_possition = [(4,4),(4,5),(5,4),(5,5)]
 
 def set_up_board():
-    temp = [[0 for i in range(WIDTH)] for j in range(HEIGHT)]
-    ## Define goal possitions
+    temp = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
     temp[rand_possition_goal[0]][rand_possition_goal[1]] = " # "
+
+    for item in obsticle_possition:
+        temp[item[0]][item[1]] = " # "
     return temp
 
 ## Define Board
 board = set_up_board()
-## Running script state
-running_state = True
+
+def update_running_state():
+    global running_state
+    running_state = False
 
 ## Draw a board
 def draw():
@@ -28,7 +40,7 @@ def draw():
 
 ## Update board while pressing arrow keys
 def draw_update(stdscr, y_axis, x_axis):
-    global board
+    global board, running_state
     board = set_up_board()
     stdscr.clear()
     if y_axis < 0:
@@ -39,12 +51,16 @@ def draw_update(stdscr, y_axis, x_axis):
         x_axis = 0
     if x_axis > WIDTH - 1:
         x_axis = WIDTH - 1
+    for item in obsticle_possition:
+        if y_axis == item[0] and x_axis == item[1]:
+            stdscr.clear()
+            print("GAME OVER!")
+            running_state = False
     if board[y_axis][x_axis] != " # ":
         board[y_axis][x_axis] = " # "
     if y_axis == rand_possition_goal[0] and x_axis == rand_possition_goal[1]:
         stdscr.clear()
-        print("GAME OVER!")
-        global running_state
+        print("You did it!")
         running_state = False
     stdscr.addstr(draw())
 
