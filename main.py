@@ -1,35 +1,42 @@
 import curses
 import random
 
-WIDTH, HEIGHT = 10, 15
-rand_possition_goal = (random.randint(1, HEIGHT), random.randint(1, WIDTH))
+WIDTH, HEIGHT, START_POSSITIONS = 10, 15, (0, 0)
+EMPTY_CELL, FILLED_CELL = " . ", " # "
+game_running_state = True
+target_position  = (
+    random.randint(0, HEIGHT -1),
+    random.randint(0, WIDTH -1)
+)
+obsticle_possitions = [(4,4),(4,5),(5,4),(5,5)]
 
-def set_up_board():
-    temp = [[0 for i in range(WIDTH)] for j in range(HEIGHT)]
-    ## Define goal possitions
-    temp[rand_possition_goal[0]][rand_possition_goal[1]] = " # "
+def board_creation():
+    temp = [[0 for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    temp[target_position [0]][target_position [1]] = FILLED_CELL
+
+    for item in obsticle_possitions:
+        temp[item[0]][item[1]] = FILLED_CELL
     return temp
 
-## Define Board
-board = set_up_board()
-## Running script state
-running_state = True
+board = board_creation()
 
-## Draw a board
-def draw():
+def update_game_running_state():
+    global game_running_state
+    game_running_state = False
+
+def draw_board():
     output = ""
     for i in range(HEIGHT):
         output += "|"
         for y in range(WIDTH):
-            output += " # " if board[i][y] else " . "
+            output += FILLED_CELL if board[i][y] else EMPTY_CELL
         output += "|"
         output += "\n"
     return output
 
-## Update board while pressing arrow keys
-def draw_update(stdscr, y_axis, x_axis):
-    global board
-    board = set_up_board()
+def draw_updated_board(stdscr, y_axis, x_axis):
+    global board, game_running_state
+    board = board_creation()
     stdscr.clear()
     if y_axis < 0:
         y_axis = 0
@@ -39,39 +46,44 @@ def draw_update(stdscr, y_axis, x_axis):
         x_axis = 0
     if x_axis > WIDTH - 1:
         x_axis = WIDTH - 1
-    if board[y_axis][x_axis] != " # ":
-        board[y_axis][x_axis] = " # "
-    if y_axis == rand_possition_goal[0] and x_axis == rand_possition_goal[1]:
+    for item in obsticle_possitions:
+        if (y_axis, x_axis) == item:
+            stdscr.clear()
+            print("GAME OVER!")
+            game_running_state = False
+    if board[y_axis][x_axis] != FILLED_CELL:
+        board[y_axis][x_axis] = FILLED_CELL
+    if (y_axis, x_axis) == target_position :
         stdscr.clear()
-        print("GAME OVER!")
-        global running_state
-        running_state = False
-    stdscr.addstr(draw())
+        print("You did it!")
+        game_running_state = False
+    stdscr.addstr(draw_board())
 
 def main(stdscr):
     curses.curs_set(0)  # Hide cursor
     stdscr.nodelay(True)
     stdscr.keypad(True)
     
-    board[0][0] = " # "
-    stdscr.addstr(draw())
-    y_axis, x_axis = 0,0
+    y_axis, x_axis = START_POSSITIONS
+    board[y_axis][x_axis] = FILLED_CELL
+    stdscr.addstr(draw_board())
 
-    while running_state:
+    while game_running_state:
         key = stdscr.getch()
         if key == curses.KEY_UP or key == ord('w'):
             y_axis -= 1
-            draw_update(stdscr, y_axis, x_axis)
+            draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_DOWN or key == ord('s'):
             y_axis += 1
-            draw_update(stdscr, y_axis, x_axis)
+            draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_LEFT or key == ord('a'):
             x_axis -= 1
-            draw_update(stdscr, y_axis, x_axis)
+            draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_RIGHT or key == ord('d'):
             x_axis += 1
-            draw_update(stdscr, y_axis, x_axis)
+            draw_updated_board(stdscr, y_axis, x_axis)
         elif key == ord('q'):
             break
 
-curses.wrapper(main)
+if __name__ == "__main__":
+    curses.wrapper(main)
