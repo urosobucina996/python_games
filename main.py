@@ -53,7 +53,7 @@ def draw_updated_board(stdscr, y_axis, x_axis):
             game_running_state = False
     if board[y_axis][x_axis] != FILLED_CELL:
         board[y_axis][x_axis] = FILLED_CELL
-    if (y_axis, x_axis) == target_position :
+    if (y_axis, x_axis) == target_position:
         stdscr.clear()
         print("You did it!")
         game_running_state = False
