@@ -38,14 +38,6 @@ def draw_updated_board(stdscr, y_axis, x_axis):
     global board, game_running_state
     board = board_creation()
     stdscr.clear()
-    if y_axis < 0:
-        y_axis = 0
-    if y_axis > HEIGHT - 1:
-        y_axis = HEIGHT -1
-    if x_axis < 0:
-        x_axis = 0
-    if x_axis > WIDTH - 1:
-        x_axis = WIDTH - 1
     for item in obsticle_possitions:
         if (y_axis, x_axis) == item:
             stdscr.clear()
@@ -71,17 +63,21 @@ def main(stdscr):
     while game_running_state:
         key = stdscr.getch()
         if key == curses.KEY_UP or key == ord('w'):
-            y_axis -= 1
-            draw_updated_board(stdscr, y_axis, x_axis)
+            if y_axis in range(1, HEIGHT):
+                y_axis -= 1
+                draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_DOWN or key == ord('s'):
-            y_axis += 1
-            draw_updated_board(stdscr, y_axis, x_axis)
+            if y_axis in range(HEIGHT - 1):
+                y_axis += 1
+                draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_LEFT or key == ord('a'):
-            x_axis -= 1
-            draw_updated_board(stdscr, y_axis, x_axis)
+            if x_axis in range(1, WIDTH):
+                x_axis -= 1
+                draw_updated_board(stdscr, y_axis, x_axis)
         elif key == curses.KEY_RIGHT or key == ord('d'):
-            x_axis += 1
-            draw_updated_board(stdscr, y_axis, x_axis)
+            if x_axis in range(WIDTH - 1):
+                x_axis += 1
+                draw_updated_board(stdscr, y_axis, x_axis)
         elif key == ord('q'):
             break
 
